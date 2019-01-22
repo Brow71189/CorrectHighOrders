@@ -134,7 +134,7 @@ class CorrectPanelDelegate(object):
             def run_calculate():
                 settings = self.settings.copy()
                 try:
-                    print(self.calculate_excitations_for_order(settings['order']))
+                    self.calculate_excitations_for_order(settings['order'])
                 finally:
                     if self.__excitations.get(settings['order']) is not None:
                         self.update_button_state(self.apply_button, True)
