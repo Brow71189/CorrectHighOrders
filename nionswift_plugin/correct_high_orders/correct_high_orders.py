@@ -18,6 +18,7 @@ class CorrectPanelDelegate(object):
         self.panel_position = 'right'
         self.settings = {'order': 'C4s'}
         self.knobs = {'C4s': ['6Sa', '6Sb', '11Sa', '11Sb', '16Sa', '16Sb']}
+        self.update_knobs = {'C4s': 'UpdateC4'}
         self.aberrations = {'C4s': ['C41.', 'C43.', 'C45.']}
         self.__excitations = {}
         self.stem_controller = Registry.get_component('stem_controller')
@@ -60,12 +61,14 @@ class CorrectPanelDelegate(object):
         logging.info(f'\nResidues (abs([M][S]-[C])):\n{residues[:, np.newaxis]}')
         return result
 
-    def apply_excitations_for_order(self, order):
+    def apply_excitations_for_order(self, order, connect_string='->'):
         if self.__excitations.get(order) is not None:
             excitations = self.__excitations.pop(order)
             knobs = self.knobs[order]
+            update_knob = self.update_knobs[order]
+            self.stem_controller.InformControl(update_knob, 0)
             for i in range(len(knobs)):
-                self.stem_controller.SetVal(knobs[i], excitations[i])
+                self.stem_controller.SetVal(update_knob + connect_string + knobs[i], -excitations[i])
 
     def update_result_widget(self, order, matrix, excitations, aberrations):
         symbol_position = int(matrix.shape[0]/2)
